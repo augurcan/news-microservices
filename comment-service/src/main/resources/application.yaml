@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: comment-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/comment
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    register-with-eureka: true
+    service-url:
+      defaultZone: ${EUREKA_URI}
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: true
