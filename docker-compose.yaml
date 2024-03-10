@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  newsdb:
+    image: mongo:5.0.25-focal
+    container_name: news-service-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: news
+    ports:
+      - "0:27017"
+    volumes:
+      - ./data/news-data:/data/db
+    restart: always
+
+  commentdb:
+    image: mongo:5.0.25-focal
+    container_name: comment-service-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: comment
+    ports:
+      - "0:27017"
+    volumes:
+      - ./data/comment-data:/data/db
+    restart: always
+
+  news-service:
+    build:
+      context: ./news-service
+      dockerfile: Dockerfile
+    image: news-service:0.0.1
+    container_name: news-service-container
+    ports:
+      - "0:8080"
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@news-service-mongodb:27017/news?authSource=admin
+    depends_on:
+      - newsdb
+      - eureka-server
+    restart: always
+
+  comment-service:
+    build:
+      context: ./comment-service
+      dockerfile: Dockerfile
+    image: comment-service:0.0.1
+    container_name: comment-service-container
+    ports:
+      - "0:8080"
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@comment-service-mongodb:27017/comment?authSource=admin
+    depends_on:
+      - commentdb
+      - eureka-server
+    restart: always
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    image: gateway:0.0.1
+    container_name: gateway-container
+    ports:
+      - "8888:8888"
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka
+    restart: always
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    image: eureka-server:0.0.1
+    container_name: eureka-container
+    ports:
+      - "8761:8761"
+    restart: always
