@@ -73,6 +73,7 @@ The project consists of two main microservices. Each service utilizes its indepe
 ```json
 		{
 			"content":"",
-			"author":""
+			"author":"",
+			"newsId":""
 		}
 ```
