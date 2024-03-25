@@ -1,5 +1,7 @@
 package com.news.newsservice.controller;
 
+import com.news.newsservice.dto.CommentRequest;
+import com.news.newsservice.dto.CommentResponse;
 import com.news.newsservice.dto.NewsAndCommentsDto;
 import com.news.newsservice.dto.NewsRequest;
 import com.news.newsservice.dto.NewsResponse;
@@ -25,32 +27,44 @@ public class NewsController {
         this.newsService = newsService;
         this.environment = environment;
     }
+
     @GetMapping("/{newsId}")
-    public ResponseEntity<NewsAndCommentsDto> getNewsById(@PathVariable("newsId") String newsId){
+    public ResponseEntity<NewsAndCommentsDto> getNewsById(@PathVariable("newsId") String newsId) {
         logger.info("News get request on port number " + environment.getProperty("server.port"));
         return ResponseEntity.ok(newsService.getNewsById(newsId));
     }
 
     @GetMapping
-    public ResponseEntity<List<NewsResponse>> getAllNews(){
+    public ResponseEntity<List<NewsResponse>> getAllNews() {
         logger.info("News get request on port number " + environment.getProperty("server.port"));
         return ResponseEntity.ok(newsService.getAllNews());
     }
+
     @DeleteMapping("/{newsId}")
-    public ResponseEntity<String> deleteNews(@PathVariable("newsId") String newsId){
+    public ResponseEntity<String> deleteNews(@PathVariable("newsId") String newsId) {
         newsService.deleteNewsById(newsId);
         logger.info("News delete request on port number " + environment.getProperty("server.port"));
         return ResponseEntity.ok("News deleted");
     }
+
     @PutMapping("/{newsId}")
     public ResponseEntity<NewsResponse> updateNews(@RequestBody NewsRequest newsRequest,
-                                             @PathVariable("newsId") String newsId){
+            @PathVariable("newsId") String newsId) {
         logger.info("News update request on port number " + environment.getProperty("server.port"));
-        return ResponseEntity.ok(newsService.updateNewsById(newsRequest,newsId));
+        return ResponseEntity.ok(newsService.updateNewsById(newsRequest, newsId));
     }
+
     @PostMapping
-    public ResponseEntity<NewsResponse> addNews(@RequestBody NewsRequest newsRequest){
+    public ResponseEntity<NewsResponse> addNews(@RequestBody NewsRequest newsRequest) {
         logger.info("News add request on port number " + environment.getProperty("server.port"));
         return new ResponseEntity<>(newsService.addNews(newsRequest), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{newsId}/comment")
+    public ResponseEntity<CommentResponse> addCommentToNews(@RequestBody CommentRequest commentRequest,
+            @PathVariable("newsId") String newsId) {
+        logger.info("Comment post request on port number " + environment.getProperty("server.port"));
+        CommentResponse addedComment = newsService.addCommentToNews(commentRequest, newsId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedComment);
     }
 }

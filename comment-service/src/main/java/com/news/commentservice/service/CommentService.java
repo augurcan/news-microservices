@@ -21,26 +21,30 @@ public class CommentService {
         this.commentRepository = commentRepository;
         this.commentDtoConverter = commentDtoConverter;
     }
-    public void deleteComment(String commentId){
+
+    public void deleteComment(String commentId) {
         commentRepository.delete(getCommentByIdInDatabase(commentId));
     }
-    public CommentResponse addCommentToNews(CommentRequest commentRequest){
+
+    public CommentResponse addCommentToNews(CommentRequest commentRequest, String newsId) {
         Comment comment = new Comment();
         comment.setAuthor(commentRequest.getAuthor());
-        comment.setNewsId(comment.getNewsId());
+        comment.setNewsId(newsId);
         comment.setContent(commentRequest.getContent());
         comment.setCreatedAt(LocalDateTime.now());
-        Comment savedComment =commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
         return commentDtoConverter.convertToDto(savedComment);
     }
-    public List<CommentResponse> getCommentsByNewsId(String newsId){
+
+    public List<CommentResponse> getCommentsByNewsId(String newsId) {
         return commentRepository.findAll()
                 .stream()
                 .map(commentDtoConverter::convertToDto)
                 .filter(comment -> comment.getNewsId().equals(newsId))
                 .collect(Collectors.toList());
     }
-    public CommentResponse updateComment(CommentRequest commentRequest,String commentId){
+
+    public CommentResponse updateComment(CommentRequest commentRequest, String commentId) {
         Comment comment = getCommentByIdInDatabase(commentId);
         if (!commentRequest.getAuthor().equals(comment.getAuthor()))
             throw new IllegalArgumentException("Invalid author for comment update");
@@ -49,8 +53,9 @@ public class CommentService {
         commentRepository.save(comment);
         return commentDtoConverter.convertToDto(comment);
     }
-    private Comment getCommentByIdInDatabase(String commentId){
+
+    private Comment getCommentByIdInDatabase(String commentId) {
         return commentRepository.findById(commentId)
-                .orElseThrow(()->new ResourceNotFoundException("Comment","Id",commentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", "Id", commentId));
     }
 }

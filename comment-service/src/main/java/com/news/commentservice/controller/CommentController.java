@@ -24,25 +24,29 @@ public class CommentController {
         this.commentService = commentService;
         this.environment = environment;
     }
+
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable("commentId") String commentId){
+    public ResponseEntity<String> deleteComment(@PathVariable("commentId") String commentId) {
         commentService.deleteComment(commentId);
         logger.info("Comment delete request on port number " + environment.getProperty("server.port"));
         return ResponseEntity.ok("Comment deleted.");
     }
+
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(@RequestBody CommentRequest commentRequest,
-                                                         @PathVariable("commentId") String commentId){
+            @PathVariable("commentId") String commentId) {
         logger.info("Comment update request on port number " + environment.getProperty("server.port"));
-        return ResponseEntity.ok(commentService.updateComment(commentRequest,commentId));
+        return ResponseEntity.ok(commentService.updateComment(commentRequest, commentId));
     }
+
     @PostMapping
-    public ResponseEntity<CommentResponse> addCommentToNews(@RequestBody CommentRequest commentRequest){
+    public ResponseEntity<CommentResponse> addCommentToNews(@RequestBody CommentRequest commentRequest, String newsId) {
         logger.info("Comment add request on port number " + environment.getProperty("server.port"));
-        return new ResponseEntity<>(commentService.addCommentToNews(commentRequest), HttpStatus.CREATED);
+        return new ResponseEntity<>(commentService.addCommentToNews(commentRequest, newsId), HttpStatus.CREATED);
     }
-    @GetMapping("/news/{newsId}")
-    public ResponseEntity<List<CommentResponse>> getAllCommentsByNewsId(@PathVariable("newsId") String newsId){
+
+    @GetMapping
+    public ResponseEntity<List<CommentResponse>> getAllCommentsByNewsId(String newsId) {
         logger.info("Comment get request on port number " + environment.getProperty("server.port"));
         return ResponseEntity.ok(commentService.getCommentsByNewsId(newsId));
     }
