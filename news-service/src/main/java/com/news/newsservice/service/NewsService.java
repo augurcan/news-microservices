@@ -48,9 +48,8 @@ public class NewsService {
         news.setTitle(newsRequest.getTitle());
         news.setContent(newsRequest.getContent());
         news.setCategory(newsRequest.getCategory());
-        NewsResponse savedNews = newsDtoConverter.convertToDto(news);
-        newsRepository.save(news);
-        return savedNews;
+        News savedNews = newsRepository.save(news);
+        return newsDtoConverter.convertToDto(savedNews);
     }
 
     public void deleteNewsById(String newsId) {
